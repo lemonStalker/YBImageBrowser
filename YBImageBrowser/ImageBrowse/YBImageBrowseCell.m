@@ -31,6 +31,8 @@
     
     UIInterfaceOrientation _statusBarOrientationBefore;
 }
+@property (nonatomic, strong) UIView *bgview;
+
 @property (nonatomic, strong) UIScrollView *mainContentView;
 @property (nonatomic, strong) YYAnimatedImageView *mainImageView;
 @property (nonatomic, strong) UIImageView *tailoringImageView;
@@ -55,14 +57,27 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self initVars];
-        
+
+        [self.contentView addSubview:self.bgview];
+
         [self.contentView addSubview:self.mainContentView];
+//        self.contentView.backgroundColor = [UIColor clearColor];
         [self.mainContentView addSubview:self.mainImageView];
         [self addGesture];
     }
     return self;
 }
 
+- (UIView *)bgview {
+    if (!_bgview) {
+        _bgview = [[UIView alloc] init];
+        UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+        UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+        effectView.frame =  self.contentView.bounds;
+        _bgview = effectView;
+    }
+    return _bgview;
+}
 - (void)prepareForReuse {
     [self initVars];
     [self removeObserverForDataState];
@@ -503,6 +518,7 @@
         _mainContentView.alwaysBounceHorizontal = NO;
         _mainContentView.alwaysBounceVertical = NO;
         _mainContentView.layer.masksToBounds = NO;
+        _mainContentView.backgroundColor = [UIColor clearColor];
         if (@available(iOS 11.0, *)) {
             _mainContentView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
