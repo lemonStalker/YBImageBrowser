@@ -82,7 +82,7 @@
     self->_defaultSheetView = sheetView;
     self->_sheetView = sheetView;
     
-    self->_shouldHideStatusBar = YES;
+    self->_shouldHideStatusBar = NO;
 }
 
 - (void)viewDidLoad {
