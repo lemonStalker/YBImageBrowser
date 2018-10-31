@@ -26,6 +26,7 @@ typedef void(^YBImageBrowserToolBarOperationBlock)(id<YBImageBrowserCellDataProt
 @property (nonatomic, strong, readonly) UIButton *operationButton;
 
 @property (nonatomic, assign) YBImageBrowserToolBarOperationType operationType;
+@property (nonatomic, copy) dispatch_block_t dismissBlock;
 
 // Custom the 'operationButton', if the 'operation' block is nil, 'operationButton' will always hidden.
 - (void)setOperationButtonImage:(UIImage * _Nullable)image title:(NSString * _Nullable)title operation:(_Nullable YBImageBrowserToolBarOperationBlock)operation;

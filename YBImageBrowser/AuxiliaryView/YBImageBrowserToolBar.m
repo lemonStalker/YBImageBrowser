@@ -21,6 +21,9 @@ static CGFloat kToolBarDefaultsHeight = 50.0;
 @property (nonatomic, strong) UILabel *indexLabel;
 @property (nonatomic, strong) UIButton *operationButton;
 @property (nonatomic, strong) CAGradientLayer *gradient;
+
+@property (nonatomic, strong) UIButton *closeBtn;
+
 @end
 
 @implementation YBImageBrowserToolBar
@@ -33,8 +36,9 @@ static CGFloat kToolBarDefaultsHeight = 50.0;
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self.layer addSublayer:self.gradient];
-        [self addSubview:self.indexLabel];
+//        [self.layer addSublayer:self.gradient];
+        
+        [self addSubview:self.closeBtn];
         [self addSubview:self.operationButton];
     }
     return self;
@@ -56,14 +60,19 @@ static CGFloat kToolBarDefaultsHeight = 50.0;
 #pragma mark - <YBImageBrowserToolBarProtocol>
 
 - (void)yb_browserUpdateLayoutWithDirection:(YBImageBrowserLayoutDirection)layoutDirection containerSize:(CGSize)containerSize {
-    CGFloat height = kToolBarDefaultsHeight, width = containerSize.width, buttonWidth = 53, labelWidth = width / 3.0, hExtra = 0;
-    if (containerSize.height > containerSize.width && YBIB_IS_IPHONEX) height += YBIB_HEIGHT_STATUSBAR;
-    if (containerSize.height < containerSize.width && YBIB_IS_IPHONEX) hExtra += YBIB_HEIGHT_EXTRABOTTOM;
+    CGFloat height = kToolBarDefaultsHeight, width = containerSize.width, buttonWidth = 38, labelWidth = width / 3.0, hExtra = 0;
+//    if (containerSize.height > containerSize.width && YBIB_IS_IPHONEX) height += YBIB_HEIGHT_STATUSBAR;
+//    if (containerSize.height < containerSize.width && YBIB_IS_IPHONEX) hExtra += YBIB_HEIGHT_EXTRABOTTOM;
     
     self.frame = CGRectMake(0, 0, width, height);
     self.gradient.frame = self.bounds;
-    self.indexLabel.frame = CGRectMake(15 + hExtra, height - kToolBarDefaultsHeight, labelWidth, kToolBarDefaultsHeight);
-    self.operationButton.frame = CGRectMake(width - buttonWidth - hExtra, height - kToolBarDefaultsHeight, buttonWidth, kToolBarDefaultsHeight);
+    if (YBIB_IS_IPHONEX) {
+        self.closeBtn.frame = CGRectMake(6, 34 + 20 + 15, buttonWidth, buttonWidth);
+        self.operationButton.frame = CGRectMake(width - buttonWidth - 10, 34 + 20 + 17 , buttonWidth, buttonWidth);
+    }else{
+        self.closeBtn.frame = CGRectMake(6, 20 + 15, buttonWidth, buttonWidth);
+        self.operationButton.frame = CGRectMake(width - buttonWidth - 10, 20 + 17 , buttonWidth, buttonWidth);
+    }
 }
 
 - (void)yb_browserPageIndexChanged:(NSUInteger)pageIndex totalPage:(NSUInteger)totalPage data:(id<YBImageBrowserCellDataProtocol>)data {
@@ -71,7 +80,7 @@ static CGFloat kToolBarDefaultsHeight = 50.0;
         case YBImageBrowserToolBarOperationTypeSave: {
             if ([data respondsToSelector:@selector(yb_browserSaveToPhotoAlbum)] && [data respondsToSelector:@selector(yb_browserAllowSaveToPhotoAlbum)] && [data yb_browserAllowSaveToPhotoAlbum]) {
                 self.operationButton.hidden = NO;
-                [self.operationButton setImage:[YBIBFileManager getImageWithName:@"ybib_save"] forState:UIControlStateNormal];
+                [self.operationButton setImage:[YBIBFileManager getImageWithName:@"download"] forState:UIControlStateNormal];
             } else {
                 self.operationButton.hidden = YES;
             }
@@ -89,12 +98,12 @@ static CGFloat kToolBarDefaultsHeight = 50.0;
     }
     
     self->_data = data;
-    if (totalPage <= 1) {
-        self.indexLabel.hidden = YES;
-    } else {
-        self.indexLabel.hidden  = NO;
-        self.indexLabel.text = [NSString stringWithFormat:@"%ld/%ld", pageIndex + 1, totalPage];
-    }
+//    if (totalPage <= 1) {
+//        self.indexLabel.hidden = YES;
+//    } else {
+//        self.indexLabel.hidden  = NO;
+//        self.indexLabel.text = [NSString stringWithFormat:@"%ld/%ld", pageIndex + 1, totalPage];
+//    }
 }
 
 #pragma mark - event
@@ -122,7 +131,22 @@ static CGFloat kToolBarDefaultsHeight = 50.0;
     }
 }
 
+- (void)closeBtnClick{
+    if (self.dismissBlock) {
+        self.dismissBlock();
+    }
+}
 #pragma mark - getter
+
+- (UIButton *)closeBtn {
+    if (!_closeBtn) {
+        _closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_closeBtn setImage:[UIImage imageNamed:@"close"] forState:UIControlStateNormal];
+        [_closeBtn addTarget:self action:@selector(closeBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _closeBtn;
+}
+
 
 - (UILabel *)indexLabel {
     if (!_indexLabel) {
