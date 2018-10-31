@@ -71,6 +71,11 @@
     self->_defaultToolBar = toolBar;
     self->_toolBars = @[toolBar];
     
+    __weak __typeof(self) weakSelf = self;
+    [self.defaultToolBar setDismissBlock:^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf hide];
+    }];
     YBImageBrowserSheetView *sheetView = [YBImageBrowserSheetView new];
     YBImageBrowserSheetAction *saveAction = [YBImageBrowserSheetAction actionWithName:[YBIBCopywriter shareCopywriter].saveToPhotoAlbum identity:kYBImageBrowserSheetActionIdentitySaveToPhotoAlbum action:nil];
     sheetView.actions = @[saveAction];
